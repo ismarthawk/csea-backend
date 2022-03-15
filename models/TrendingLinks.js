@@ -6,3 +6,5 @@ const TrendingLinksSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+module.exports = mongoose.model("TrendingLinks", TrendingLinksSchema);

@@ -27,3 +27,5 @@ const upcomingEventsSchema = new mongoose.Schema({
     default: "Online",
   },
 });
+
+module.exports = mongoose.model("UpcomingEvents", upcomingEventsSchema);

@@ -27,3 +27,5 @@ const CompletedEventsSchema = new mongoose.Schema({
     default: "Online",
   },
 });
+
+module.exports = mongoose.model("CompletedEvents", CompletedEventsSchema);
