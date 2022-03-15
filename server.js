@@ -6,7 +6,7 @@ const connectDB = require("./config/db");
 
 const TrendingLinks = require("./models/TrendingLinks");
 const UpcomingEvents = require("./models/UpcomingEvents");
-const { time } = require("console");
+const CompletedEvents = require("./models/CompletedEvents");
 
 // Loading the config files.
 dotenv.config({
@@ -21,36 +21,62 @@ app.use(express.json());
 
 // Rote to get the upcoming Events.
 app.get("/upcoming-events", (req, res) => {
-  UpcomingEvents.find().then((events) => {
+  const events = UpcomingEvents.find().then((events) => {
+    list = [];
+    events.forEach((event) => {
+      const eveDate = new Date(event.time);
+      const currDate = new Date();
+
+      if (eveDate < currDate) {
+        const compEvent = CompletedEvents({
+          title: event.title,
+          desc: event.desc,
+          time: event.time,
+          venue: event.venue,
+        });
+        compEvent.save();
+        UpcomingEvents.deleteOne(
+          {
+            id: event.id,
+          },
+          (err) => {
+            // console.log(err);
+          }
+        );
+      } else {
+        list = [...list, event];
+      }
+    });
     res.json({
-      events: events,
+      events: list,
     });
   });
 });
 
 app.post("/upcoming-events", (req, res) => {
-  UpcomingEvents.create({
+  const newEvent = UpcomingEvents({
     ...req.body,
-    time: Date(req.body.time),
-  })
-    .then(() => {
-      //   console.log("new Event Created");
-      res.json({
-        created: "success",
-      });
-    })
-    .catch((err) => {
-      res.json({
-        created: "fail",
+    time: new Date(req.body.time),
+  });
+  newEvent.save((err) => {
+    if (err) {
+      res.status(400).json({
+        success: false,
         error: err.message,
       });
-    });
+    }
+  });
+  res.status(200).json({
+    success: true,
+  });
 });
 
 // Route to get the completed Events.
 app.get("/completed-events", (req, res) => {
-  res.status(200).json({
-    success: false,
+  CompletedEvents.find().then((events) => {
+    res.status(200).json({
+      events: events,
+    });
   });
 });
 
