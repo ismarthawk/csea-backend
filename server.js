@@ -1,17 +1,17 @@
+const dotenv = require("dotenv").config({
+    path: "./config/config.env",
+});
 const express = require("express");
-const dotenv = require("dotenv");
+const Grid = require("gridfs-stream");
+const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 
-// Schema imports.
+// Route imports
+const event = require("./routes/event");
+const link = require("./routes/link");
 
-const TrendingLinks = require("./models/TrendingLinks");
-const UpcomingEvents = require("./models/UpcomingEvents");
-const CompletedEvents = require("./models/CompletedEvents");
-
-// Loading the config files.
-dotenv.config({
-  path: "./config/config.env",
-});
+// Variables for GridFS
+let gfs, gridfsBucket;
 
 // connect to DB.
 const db = connectDB();
@@ -19,87 +19,39 @@ const db = connectDB();
 const app = express();
 app.use(express.json());
 
-// Rote to get the upcoming Events.
-app.get("/upcoming-events", (req, res) => {
-  const events = UpcomingEvents.find().then((events) => {
-    list = [];
-    events.forEach((event) => {
-      const eveDate = new Date(event.time);
-      const currDate = new Date();
+const conn = mongoose.connection;
+conn.once("open", () => {
+    gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+        bucketName: "fs",
+    });
 
-      if (eveDate < currDate) {
-        const compEvent = CompletedEvents({
-          title: event.title,
-          desc: event.desc,
-          time: event.time,
-          venue: event.venue,
-        });
-        compEvent.save();
-        UpcomingEvents.deleteOne(
-          {
-            id: event.id,
-          },
-          (err) => {
-            // console.log(err);
-          }
-        );
-      } else {
-        list = [...list, event];
-      }
-    });
-    res.json({
-      events: list,
-    });
-  });
+    gfs = Grid(conn.db, mongoose.mongo);
+    gfs.collection("fs");
 });
 
-app.post("/upcoming-events", (req, res) => {
-  const newEvent = UpcomingEvents({
-    ...req.body,
-    time: new Date(req.body.time),
-  });
-  newEvent.save((err) => {
-    if (err) {
-      res.status(400).json({
-        success: false,
-        error: err.message,
-      });
+app.use("/event", event);
+app.use("/link", link);
+
+// Event Poster Routes
+app.get("/event/poster/:filename", async (req, res) => {
+    try {
+        const file = await gfs.files.findOne({ filename: req.params.filename });
+        const readStream = gridfsBucket.openDownloadStream(file._id);
+        readStream.pipe(res);
+    } catch (error) {
+        console.log(error);
+        res.send("Event poster not found");
     }
-  });
-  res.status(200).json({
-    success: true,
-  });
 });
 
-// Route to get the completed Events.
-app.get("/completed-events", (req, res) => {
-  CompletedEvents.find().then((events) => {
-    res.status(200).json({
-      events: events,
-    });
-  });
-});
-
-// Route to get the trending Youtube Links
-app.get("/trending-links", (req, res) => {
-  TrendingLinks.find()
-    .then((links) => {
-      res.status(200).send({
-        links: links,
-      });
-    })
-    .catch((err) => {
-      res.status(400).json({
-        error: err.message,
-      });
-    });
-});
-
-app.post("/trending-links", (req, res) => {
-  TrendingLinks.create(req.body);
-  res.status(200).json({
-    created: "success",
-  });
+app.delete("/file/poster/:filename", async (req, res) => {
+    try {
+        await gfs.files.deleteOne({ filename: req.params.filename });
+        res.send("Successfully Uploaded");
+    } catch (error) {
+        console.log(error);
+        res.send("An Error occurred.");
+    }
 });
 
 const port = process.env.PORT;
