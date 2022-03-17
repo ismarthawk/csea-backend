@@ -5,7 +5,7 @@ const router = express.Router();
 const TrendingLinks = require("../models/TrendingLinks");
 
 // Route to get the trending Youtube Links
-router.get("/trending-links", (req, res) => {
+router.get("/", (req, res) => {
     TrendingLinks.find()
         .then((links) => {
             res.status(200).send({
@@ -20,7 +20,7 @@ router.get("/trending-links", (req, res) => {
 });
 
 // Route to post the trending Youtube Links
-router.post("/trending-links", (req, res) => {
+router.post("/", (req, res) => {
     TrendingLinks.create(req.body);
     res.status(200).json({
         created: "success",

@@ -5,8 +5,9 @@ const router = express.Router();
 const UpcomingEvents = require("../models/UpcomingEvents");
 const CompletedEvents = require("../models/CompletedEvents");
 
-// image upload middleware import
-const upload = require("../middleware/image-upload");
+const poster = require("./poster");
+
+router.use("/poster", poster);
 
 // Route to get the upcoming Events.
 router.get("/upcoming", (req, res) => {
@@ -67,16 +68,6 @@ router.get("/completed", (req, res) => {
             events: events,
         });
     });
-});
-
-// Route to post an event poster.
-router.post("/poster", upload.single("poster"), async (req, res) => {
-    if (req.file === undefined) {
-        return res.send("No image selected!");
-    }
-
-    const imgUrl = `http://localhost:3000/event/poster/${req.file.filename}`;
-    return res.send(imgUrl);
 });
 
 module.exports = router;
