@@ -2,9 +2,6 @@ const router = require("express").Router();
 const Grid = require("gridfs-stream");
 const mongoose = require("mongoose");
 
-// image upload middleware import
-const upload = require("../middleware/poster-upload");
-
 // Variables for GridFS
 let gfs, gridfsBucket;
 
@@ -15,20 +12,6 @@ conn.once("open", () => {
     });
     gfs = Grid(conn.db, mongoose.mongo);
     gfs.collection("fs");
-});
-
-// Route to post an event poster.
-router.post("/", upload.single("poster"), async (req, res) => {
-    if (req.file === undefined) {
-        return res.status(400).json({
-            success: false,
-            message: "No Image Selected",
-        });
-    }
-    const imgUrl = `http://localhost:3000/event/poster/${req.file.filename}`;
-    res.status(200).json({
-        imgUrl: imgUrl,
-    });
 });
 
 // Route to get an event poster

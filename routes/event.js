@@ -5,6 +5,9 @@ const router = express.Router();
 const UpcomingEvents = require("../models/UpcomingEvents");
 const CompletedEvents = require("../models/CompletedEvents");
 
+// image upload middleware import
+const upload = require("../middleware/poster-upload");
+
 const poster = require("./poster");
 
 router.use("/poster", poster);
@@ -21,6 +24,7 @@ router.get("/upcoming", (req, res) => {
                 const compEvent = CompletedEvents({
                     title: event.title,
                     desc: event.desc,
+                    imgUrl: event.imgUrl,
                     time: event.time,
                     venue: event.venue,
                 });
@@ -43,9 +47,11 @@ router.get("/upcoming", (req, res) => {
     });
 });
 
-router.post("/upcoming", (req, res) => {
+// Route to post an upcoming Event.
+router.post("/upcoming", upload.single("poster"), async (req, res) => {
     const newEvent = UpcomingEvents({
         ...req.body,
+        imgUrl: `http://localhost:3000/event/poster/${req.file.filename}`,
         time: new Date(req.body.time),
     });
     newEvent.save((err) => {

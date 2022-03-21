@@ -18,4 +18,4 @@ app.use("/event", event);
 app.use("/link", link);
 
 const port = process.env.PORT;
-app.listen(port, console.log("server running in port", port));
+app.listen(port, console.log(`Server running on port ${port}`));
