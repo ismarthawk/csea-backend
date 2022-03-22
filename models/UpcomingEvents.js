@@ -1,37 +1,35 @@
 const mongoose = require("mongoose");
 
 const upcomingEventsSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: [true, "Please Add a Name"],
-    },
-    desc: {
-        type: String,
-        required: [true, "Please add a Description"],
-    },
+  title: {
+    type: String,
+    required: [true, "Please Add a Name"],
+  },
+  desc: {
+    type: String,
+    required: [true, "Please add a Description"],
+  },
 
-    link: {
-        type: String,
-        required: false,
-        default: null,
-    },
+  link: {
+    type: String,
+    required: false,
+    default: null,
+  },
 
-    //  Have to deal with the profile picture
+  imgUrl: {
+    type: String,
+    required: [true, "Please add an image"],
+  },
 
-    imgUrl: {
-        type: String,
-        required: [true, "Please add an image"],
-    },
+  time: {
+    type: Date,
+    required: [true, "Please Enter a Time"],
+  },
 
-    time: {
-        type: Date,
-        required: [true, "Please Enter a Time"],
-    },
-
-    venue: {
-        type: String,
-        default: "Online",
-    },
+  venue: {
+    type: String,
+    default: "Online",
+  },
 });
 
 module.exports = mongoose.model("UpcomingEvents", upcomingEventsSchema);
