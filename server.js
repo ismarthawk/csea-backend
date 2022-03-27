@@ -7,6 +7,8 @@ const connectDB = require("./config/db");
 // Route imports
 const event = require("./routes/event");
 const link = require("./routes/link");
+const gallery = require("./routes/gallery");
+const person = require("./routes/person");
 
 // connect to DB.
 const db = connectDB();
@@ -14,8 +16,16 @@ const db = connectDB();
 const app = express();
 app.use(express.json());
 
-app.use("/event", event);
 app.use("/link", link);
+app.use("/person", person);
+app.use("/gallery", gallery);
+app.use("/event", event);
+
+app.use("/*", (req, res) => {
+    res.status(404).json({
+        message: "Page not found",
+    });
+});
 
 const port = process.env.PORT;
 app.listen(port, console.log(`Server running on port ${port}`));

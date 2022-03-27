@@ -10,6 +10,27 @@ const storage = new GridFsStorage({
     poster: (req, file) => {
         const match = ["image/png", "image/jpeg"];
         if (match.indexOf(file.mimetype) === -1) {
+            return null;
+        }
+        return {
+            bucketName: "fs",
+            filename: `${Date.now()}-${file.originalname}`,
+        };
+    },
+    profile: (req, file) => {
+        const match = ["image/png", "image/jpeg"];
+        if (match.indexOf(file.mimetype) === -1) {
+            const filename = `${Date.now()}-${file.originalname}`;
+            return filename;
+        }
+        return {
+            bucketName: "fs",
+            filename: `${Date.now()}-${file.originalname}`,
+        };
+    },
+    image: (req, file) => {
+        const match = ["image/png", "image/jpeg"];
+        if (match.indexOf(file.mimetype) === -1) {
             const filename = `${Date.now()}-${file.originalname}`;
             return filename;
         }
