@@ -14,7 +14,6 @@ const upcomingEventsSchema = new mongoose.Schema({
         required: false,
         default: null,
     },
-
     imgUrl: {
         type: String,
         required: [true, "Please add an image"],
@@ -24,6 +23,10 @@ const upcomingEventsSchema = new mongoose.Schema({
         required: [true, "Please Enter a Time"],
     },
     venue: {
+        type: String,
+        required: [true, "Please Enter a Venue"],
+    },
+    mode: {
         type: String,
         default: "Online",
     },

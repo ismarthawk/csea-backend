@@ -9,6 +9,7 @@ const event = require("./routes/event");
 const link = require("./routes/link");
 const gallery = require("./routes/gallery");
 const person = require("./routes/person");
+const resource = require("./routes/resource");
 
 // connect to DB.
 const db = connectDB();
@@ -20,6 +21,7 @@ app.use("/link", link);
 app.use("/person", person);
 app.use("/gallery", gallery);
 app.use("/event", event);
+app.use("/resource", resource);
 
 app.use("/*", (req, res) => {
     res.status(404).json({
